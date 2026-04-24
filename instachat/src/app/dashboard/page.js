@@ -119,52 +119,53 @@ export default function Dashboard() {
     <div className="flex h-screen bg-[#09090b] text-white overflow-hidden">
       {!profileData?.username && <CompleteProfileModal />}
       
-      {/* 1. Slim Navigation Sidebar */}
-      <nav className="flex w-20 flex-col items-center justify-between border-r border-white/5 bg-black py-8">
-        <div className="flex flex-col gap-8">
-          <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 to-blue-500">
-            <MessageSquare size={20} />
+      {/* 1. Slim Navigation Sidebar - hidden on mobile when chat is open */}
+      <nav className={`flex-shrink-0 flex w-16 md:w-20 flex-col items-center justify-between border-r border-white/5 bg-black py-6 md:py-8 ${selectedChat ? "hidden md:flex" : "flex"}`}>
+        <div className="flex flex-col gap-6 md:gap-8">
+          <div className="h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 to-blue-500">
+            <MessageSquare size={16} className="md:hidden" />
+            <MessageSquare size={20} className="hidden md:block" />
           </div>
-          <div className="flex flex-col gap-6">
-            <NavIcon icon={<MessageSquare />} active={activeTab === "chats"} onClick={() => setActiveTab("chats")} />
-            <NavIcon icon={<Phone />} active={activeTab === "calls"} onClick={() => setActiveTab("calls")} />
-            <NavIcon icon={<Users />} active={activeTab === "connections"} onClick={() => setActiveTab("connections")} />
+          <div className="flex flex-col gap-4 md:gap-6">
+            <NavIcon icon={<MessageSquare size={20} />} active={activeTab === "chats"} onClick={() => setActiveTab("chats")} />
+            <NavIcon icon={<Phone size={20} />} active={activeTab === "calls"} onClick={() => setActiveTab("calls")} />
+            <NavIcon icon={<Users size={20} />} active={activeTab === "connections"} onClick={() => setActiveTab("connections")} />
           </div>
         </div>
-        <div className="flex flex-col gap-6">
-          <NavIcon icon={<Settings />} active={activeTab === "settings"} onClick={() => setActiveTab("settings")} />
+        <div className="flex flex-col gap-4 md:gap-6 items-center">
+          <NavIcon icon={<Settings size={20} />} active={activeTab === "settings"} onClick={() => setActiveTab("settings")} />
           <button onClick={logout} className="text-zinc-500 transition-colors hover:text-red-500">
-            <LogOut size={24} />
+            <LogOut size={20} />
           </button>
-          <img src={user.photoURL} alt="Profile" className="h-10 w-10 rounded-full border border-white/10" />
+          <img src={user.photoURL} alt="Profile" className="h-8 w-8 md:h-10 md:w-10 rounded-full border border-white/10" />
         </div>
       </nav>
 
-      {/* 2. Content Sidebar (Chat List / Connections List) */}
-      <aside className="flex w-full max-w-[380px] flex-col border-r border-white/5 bg-[#09090b]">
-        <header className="flex flex-col p-6 gap-6">
+      {/* 2. Content Sidebar */}
+      <aside className={`flex-shrink-0 flex w-full md:w-[320px] lg:w-[380px] flex-col border-r border-white/5 bg-[#09090b] ${selectedChat ? "hidden md:flex" : "flex"}`}>
+        <header className="flex flex-col p-4 md:p-6 gap-4 md:gap-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold capitalize">{activeTab}</h1>
+            <h1 className="text-xl md:text-2xl font-bold capitalize">{activeTab}</h1>
             <button 
               onClick={() => setIsSearchOpen(true)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600 transition-hover hover:bg-purple-700"
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600 hover:bg-purple-700"
             >
               <Plus size={18} />
             </button>
           </div>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
             <input 
               type="text" 
               placeholder="Search..." 
-              className="w-full rounded-xl bg-white/5 py-3 pl-10 pr-4 text-sm outline-none transition-focus focus:ring-1 focus:ring-purple-500"
+              className="w-full rounded-xl bg-white/5 py-2.5 pl-9 pr-4 text-sm outline-none focus:ring-1 focus:ring-purple-500"
             />
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-4 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto px-3 md:px-4 custom-scrollbar">
           {incomingRequests.length > 0 && (
-             <div className="mb-6 px-2">
+             <div className="mb-4 px-1">
                 <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-3 flex items-center gap-2">
                   <Bell size={12} /> Pending Requests
                 </p>
@@ -175,9 +176,7 @@ export default function Dashboard() {
                            <img src={req.senderPhoto} className="h-8 w-8 rounded-full" alt="" />
                            <p className="text-xs font-medium">{req.senderName.split(' ')[0]}</p>
                         </div>
-                        <div className="flex gap-2">
-                           <button onClick={() => acceptRequest(req)} className="bg-purple-600 text-[10px] px-3 py-1 rounded-md font-bold hover:bg-purple-700">Accept</button>
-                        </div>
+                        <button onClick={() => acceptRequest(req)} className="bg-purple-600 text-[10px] px-3 py-1 rounded-md font-bold hover:bg-purple-700">Accept</button>
                      </div>
                    ))}
                 </div>
@@ -185,7 +184,7 @@ export default function Dashboard() {
           )}
           
           {activeTab === "chats" && (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               {connections.length > 0 ? connections.map(con => (
                 <ChatPreview 
                   key={con.uid}
@@ -230,28 +229,22 @@ export default function Dashboard() {
         </main>
       </aside>
 
-      {/* 3. Main Chat View / Placeholder */}
-      <section className="flex flex-1 flex-col bg-[#0c0c0e]">
+      {/* 3. Main Chat View */}
+      <section className={`flex-1 flex flex-col bg-[#0c0c0e] min-w-0 overflow-hidden ${selectedChat ? "flex" : "hidden md:flex"}`}>
         {activeTab === "settings" ? (
           <SettingsPanel />
         ) : selectedChat ? (
-          <ChatWindow selectedChat={selectedChat} />
+          <ChatWindow selectedChat={selectedChat} onBack={() => setSelectedChat(null)} />
         ) : (
-          <div className="flex flex-1 flex-col items-center justify-center text-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="max-w-md space-y-6"
-            >
+          <div className="flex flex-1 flex-col items-center justify-center text-center p-6">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md space-y-6">
               <div className="flex justify-center">
                 <div className="h-24 w-24 flex items-center justify-center rounded-3xl bg-white/5 text-purple-500">
                     <MessageSquare size={48} />
                 </div>
               </div>
-              <h2 className="text-3xl font-bold">InstaChat Desktop</h2>
-              <p className="text-zinc-500">
-                Send and receive messages without keeping your phone online. Use InstaChat on up to 4 linked devices and 1 phone at the same time.
-              </p>
+              <h2 className="text-2xl md:text-3xl font-bold">InstaChat</h2>
+              <p className="text-zinc-500 text-sm md:text-base">Select a chat to start messaging. Connect with people and make calls!</p>
             </motion.div>
           </div>
         )}
