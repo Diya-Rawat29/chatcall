@@ -43,6 +43,7 @@ export default function Dashboard() {
   const socketRef = useRef(null);
 
   // Call state
+  const [socketConnected, setSocketConnected] = useState(false);
   const [callState, setCallState] = useState(null); // null | "calling" | "incoming" | "connected"
   const [callerName, setCallerName] = useState("");
   const [isAudioOnly, setIsAudioOnly] = useState(false);
@@ -71,9 +72,17 @@ export default function Dashboard() {
   // ── Socket setup (at Dashboard level — works everywhere) ──
   useEffect(() => {
     if (!user) return;
-    const sock = io(SOCKET_SERVER, { transports: ["websocket", "polling"], reconnectionAttempts: 10 });
+    const sock = io(SOCKET_SERVER, { transports: ["websocket", "polling"], reconnectionAttempts: 15, reconnectionDelay: 2000 });
     socketRef.current = sock;
-    sock.emit("setup", { uid: user.uid, displayName: user.displayName });
+
+    const doSetup = () => {
+      sock.emit("setup", { uid: user.uid, displayName: user.displayName });
+      setSocketConnected(true);
+    };
+    sock.on("connect", doSetup);
+    sock.on("reconnect", doSetup);
+    sock.on("disconnect", () => setSocketConnected(false));
+    sock.on("connect_error", () => setSocketConnected(false));
 
     sock.on("incoming-call", ({ signal, from, name, callType }) => {
       if (callStateRef.current) return;
@@ -175,6 +184,10 @@ export default function Dashboard() {
   const initiateCall = async (type, targetChat) => {
     const chat = targetChat || selectedChat;
     if (!chat) return;
+    if (!socketRef.current?.connected) {
+      alert("Connecting to server... Please wait a moment and try again.");
+      return;
+    }
     const isVideo = type === "video";
     callTypeRef.current = type;
     isInitiator.current = true;
@@ -323,8 +336,12 @@ export default function Dashboard() {
         <div className="flex flex-col gap-5 items-center">
           <NavIcon icon={<Settings size={20} />} active={activeTab === "settings"} onClick={() => setActiveTab("settings")} />
           <button onClick={logout} className="text-zinc-500 hover:text-red-500 transition-colors"><LogOut size={20} /></button>
-          <img src={user.photoURL} alt="" className="h-8 w-8 md:h-9 md:w-9 rounded-full border border-white/10" />
+          <div className="relative">
+            <img src={user.photoURL} alt="" className="h-8 w-8 md:h-9 md:w-9 rounded-full border border-white/10" />
+            <span title={socketConnected ? "Connected" : "Connecting..."} className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-black ${socketConnected ? "bg-green-400" : "bg-orange-400 animate-pulse"}`} />
+          </div>
         </div>
+
       </nav>
 
       {/* Chat List Sidebar */}
