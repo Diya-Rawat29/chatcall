@@ -1,0 +1,200 @@
+# 🚀 InstaChat Project Plan (Chat + Call + Social App)
+
+## 🎯 Goal
+
+Build a full-featured communication app like WhatsApp + Instagram with:
+
+* User login/signup
+* Send/accept connection requests
+* Chat (text + media)
+* Voice messages
+* Voice/video calling
+* Status/Stories
+
+---
+
+## 🧱 Tech Stack
+
+* Frontend: Next.js + Tailwind CSS
+* Backend: Node.js + Express
+* Database & Auth: Firebase (Firestore + Auth + Storage)
+* Real-time: Socket.IO
+* Calling: WebRTC
+
+---
+
+## 🧠 System Flow
+
+### 1. Authentication
+
+User → Login/Signup → Firebase Auth → Dashboard
+
+### 2. Connection System
+
+User A → Send Request → User B → Accept → Connected
+
+### 3. Chat System
+
+User → Send Message → Socket → Server → Firebase → Receiver
+
+### 4. Call System
+
+User A → Call Request → User B → Accept → WebRTC Connection → Call Start
+
+---
+
+## 🏗️ Modules
+
+### ✅ Module 1: Authentication
+
+* Email/Google login
+* User profile creation
+
+### ✅ Module 2: User Connection
+
+* Search users
+* Send request
+* Accept/reject
+* Friends list
+
+### ✅ Module 3: Chat System
+
+* Real-time messaging
+* Seen/typing status
+* Media sharing
+
+### ✅ Module 4: Voice Message
+
+* Record audio
+* Upload & play
+
+### ✅ Module 5: Voice/Video Call
+
+* Call UI
+* Accept/reject
+* Live audio/video
+
+### ✅ Module 6: Status/Stories
+
+* Upload media
+* Auto delete after 24h
+
+---
+
+## 🧩 Database Structure
+
+### users
+
+* uid
+* name
+* email
+* photoURL
+* connections[]
+
+### requests
+
+* senderId
+* receiverId
+* status
+
+### messages
+
+* senderId
+* receiverId
+* text
+* mediaUrl
+
+---
+
+## 🔌 APIs Used
+
+### Firebase Auth
+
+* createUser
+* login
+* logout
+
+### Firestore
+
+* addDoc
+* getDocs
+* onSnapshot
+
+### Storage
+
+* upload file
+* get URL
+
+### Socket.IO
+
+* sendMessage
+* receiveMessage
+* callUser
+
+### WebRTC
+
+* getUserMedia
+* peer connection
+
+---
+
+## 📱 User Flow
+
+1. User Login
+2. Search Users
+3. Send Request
+4. Accept Request
+5. Start Chat
+6. Send Voice/Media
+7. Start Call
+
+---
+
+## 🎨 UI Pages
+
+* Login Page
+* Dashboard
+* Chat Screen
+* Request Screen
+* Call Screen
+
+---
+
+## 🚀 Development Phases
+
+### Phase 1
+
+Auth + Chat
+
+### Phase 2
+
+Connection + Voice Message
+
+### Phase 3
+
+Call + Status
+
+### Phase 4
+
+Advanced Features
+
+---
+
+## 💡 Final Output
+
+A fully working social chat app with real-time messaging, calling, and social connections.
+
+
+npm install firebase
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if
+          request.time < timestamp.date(2026, 5, 21);
+    }
+  }
+}
+caution:
